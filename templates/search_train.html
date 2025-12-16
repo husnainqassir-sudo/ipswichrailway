@@ -1,0 +1,83 @@
+
+{% for train in trains %}
+ <h3><a href="{% url 'dashboard' %}"><button style="width:600px;color:white;border-radius:8px;height:45px;background-color:#333">Home</button></a></h3>
+
+
+<div style="margin-bottom:20px; border:1px solid #ccc; padding:15px; border-radius:8px;">
+
+
+
+    <br>
+<br>
+    <img src="{{ train.img.url }}" style="width:100px; height:70px">
+    <b>{{ train.trainname }}</b> ({{ train.train_no }})<br>
+    From: {{ train.from_city }} &nbsp;&nbsp; To: {{ train.to_city }}<br>
+
+    <!-- Add Passenger Form -->
+    <form method="post" style="margin-top:10px;">
+        {% csrf_token %}
+
+        <input type="hidden" name="train_id" value="{{ train.id }}">
+
+        <input type="text" name="name" placeholder="Passenger Name" required>
+        <input type="number" name="age" placeholder="Age" required>
+
+        <select name="gender" required>
+            <option value="">Select Gender</option>
+            <option>Male</option>
+            <option>Female</option>
+        </select>
+
+        <!-- ROUTE DROPDOWN -->
+        <select name="route_id" required>
+            <option value="">Select Route</option>
+            {% for r in train.add_route_set.all %}
+                <option value="{{ r.id }}">
+                    {{ r.route }} (Fare: {{ r.fare }})
+                </option>
+            {% endfor %}
+        </select>
+
+        <input type="submit" value="Add Passenger">
+    </form>
+
+    <!-- Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color:green;"><strong>{{ message }}</strong></p>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Passenger List -->
+    <h4>Passengers Added:</h4>
+    <table border="1" width="100%">
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Gender</th>
+            <th>Route</th>
+            <th>Fare</th>
+            <th>Action</th>
+        </tr>
+
+        {% for p in passengers %}
+            {% if p.train.id == train.id %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ p.name }}</td>
+                <td>{{ p.age }}</td>
+                <td>{{ p.gender }}</td>
+                <td>{{ p.route }}</td>
+                <td>{{ p.fare }}</td>
+                <td>
+                    <a href="{% url 'delete_passenger' p.id train.id %}" style="color:red;">Delete</a>
+                </td>
+            </tr>
+            {% endif %}
+        {% endfor %}
+    </table>
+
+      <li class="id1"><a href="{% url 'nav' %}">Home</a></li>
+</div>
+{% endfor %}
